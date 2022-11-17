@@ -93,6 +93,35 @@ const httpRequestListener = function (req, res) {
       });
     }
   }
+
+  if (method === 'PATCH') {
+    if (url.startsWith('/posts/')) {
+      const id = Number(url.split('/')[2]); // 여기서 id는 게시물 id
+      console.log(id);
+      let body = '';
+      req.on('data', (data) => {
+        body += data;
+      });
+
+      req.on('end', () => {
+        const edit = JSON.parse(body);
+        const index = posts.find((ele) => {
+          return ele.id === id;
+        });
+        console.log(index);
+        console.log(edit.content);
+        if (!index) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify('Not Found'));
+        } else {
+          index.content = edit.content;
+        }
+        console.log(index);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify(index));
+      });
+    }
+  }
 };
 
 server.on('request', httpRequestListener);
