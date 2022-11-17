@@ -67,12 +67,14 @@ const httpRequestListener = function (req, res) {
           password: user.password,
         });
         res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'userCreated' }));
+        return res.end(JSON.stringify({ message: 'userCreated' }));
       });
     }
 
-    if (url === '/posts') {
+    if (url.startsWith('/')) {
+      const id = Number(url.split('/')[1]);
       let body = '';
+
       req.on('data', (data) => {
         body += data;
       });
@@ -83,11 +85,11 @@ const httpRequestListener = function (req, res) {
           id: post.id,
           title: post.title,
           content: post.content,
-          userId: post.userId,
+          userId: id,
         });
         console.log(posts);
         res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'postCreated' }));
+        return res.end(JSON.stringify({ message: 'postCreated' }));
       });
     }
   }
