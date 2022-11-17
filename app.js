@@ -20,14 +20,14 @@ const users = [
 const posts = [
   {
     id: 1,
-    username: 'aaa',
+    username: 'kevin',
     title: 'test1',
     content: 'askdladalkjfaklfjasja',
     userId: 1,
   },
   {
     id: 2,
-    username: 'aaa',
+    username: 'kevin',
     title: 'test2',
     content: 'askdladalkjfaklfjasja',
     userId: 1,
@@ -48,6 +48,28 @@ const httpRequestListener = function (req, res) {
     if (url === '/') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(posts));
+    }
+
+    if (url.startsWith('/')) {
+      const id = Number(url.split('/')[1]); // 이때 id는 userId
+      const user = users.find((ele) => {
+        return ele.id === id;
+      });
+      if (!user) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify('Not Found'));
+      }
+      const post = posts.filter((ele) => {
+        return ele.userId === id;
+      });
+      const data = {
+        userID: user.id,
+        userName: user.name,
+        postings: post,
+      };
+      console.log(data);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify(data));
     }
   }
   if (method === 'POST') {
@@ -123,7 +145,6 @@ const httpRequestListener = function (req, res) {
   if (method === 'DELETE') {
     if (url.startsWith('/posts/')) {
       const id = Number(url.split('/')[2]);
-      console.log(id);
       for (let i = 0; i < posts.length; i++) {
         if (posts[i].id === id) {
           posts.splice(i, 1);
