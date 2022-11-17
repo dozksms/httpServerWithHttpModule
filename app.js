@@ -20,20 +20,36 @@ const users = [
 const posts = [
   {
     id: 1,
+    username: 'aaa',
     title: 'test1',
     content: 'askdladalkjfaklfjasja',
     userId: 1,
   },
   {
     id: 2,
+    username: 'aaa',
     title: 'test2',
     content: 'askdladalkjfaklfjasja',
     userId: 1,
+  },
+  {
+    id: 3,
+    username: 'bbb',
+    title: 'test2',
+    content: 'askdladalkjfaklfjasja',
+    userId: 2,
   },
 ];
 
 const httpRequestListener = function (req, res) {
   const { url, method } = req;
+
+  if (method === 'GET') {
+    if (url === '/') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(posts));
+    }
+  }
 
   if (method === 'POST') {
     if (url === '/user') {
@@ -57,7 +73,6 @@ const httpRequestListener = function (req, res) {
     }
 
     if (url === '/posts') {
-      console.log('asdsa');
       let body = '';
       req.on('data', (data) => {
         body += data;
