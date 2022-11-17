@@ -1,4 +1,3 @@
-const { ok } = require('assert');
 const http = require('http');
 
 const server = http.createServer();
@@ -57,7 +56,8 @@ const httpRequestListener = function (req, res) {
       });
     }
 
-    if (url === '/posting') {
+    if (url === '/posts') {
+      console.log('asdsa');
       let body = '';
       req.on('data', (data) => {
         body += data;
