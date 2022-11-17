@@ -47,10 +47,8 @@ const httpRequestListener = function (req, res) {
   if (method === 'GET') {
     if (url === '/') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(posts));
-    }
-
-    if (url.startsWith('/')) {
+      return res.end(JSON.stringify(posts));
+    } else if (url.startsWith('/')) {
       const id = Number(url.split('/')[1]); // 이때 id는 userId
       const user = users.find((ele) => {
         return ele.id === id;
@@ -58,21 +56,21 @@ const httpRequestListener = function (req, res) {
       if (!user) {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify('Not Found'));
+      } else {
+        const post = posts.filter((ele) => {
+          return ele.userId === id;
+        });
+        const data = {
+          userID: user.id,
+          userName: user.name,
+          postings: post,
+        };
+        console.log(data);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify(data));
       }
-      const post = posts.filter((ele) => {
-        return ele.userId === id;
-      });
-      const data = {
-        userID: user.id,
-        userName: user.name,
-        postings: post,
-      };
-      console.log(data);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      return res.end(JSON.stringify(data));
     }
-  }
-  if (method === 'POST') {
+  } else if (method === 'POST') {
     if (url === '/user') {
       let body = '';
       req.on('data', (data) => {
@@ -81,7 +79,6 @@ const httpRequestListener = function (req, res) {
 
       req.on('end', () => {
         const user = JSON.parse(body);
-
         users.push({
           id: user.id,
           name: user.name,
@@ -91,9 +88,7 @@ const httpRequestListener = function (req, res) {
         res.writeHead(201, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ message: 'userCreated' }));
       });
-    }
-
-    if (url.startsWith('/')) {
+    } else if (url.startsWith('/')) {
       const id = Number(url.split('/')[1]);
       let body = '';
 
@@ -109,22 +104,21 @@ const httpRequestListener = function (req, res) {
         if (!user) {
           res.writeHead(404, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify('Not Found'));
+        } else {
+          posts.push({
+            id: post.id,
+            username: user.name,
+            title: post.title,
+            content: post.content,
+            userId: id,
+          });
+          console.log(posts);
+          res.writeHead(201, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ message: 'postCreated' }));
         }
-        posts.push({
-          id: post.id,
-          username: user.name,
-          title: post.title,
-          content: post.content,
-          userId: id,
-        });
-        console.log(posts);
-        res.writeHead(201, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ message: 'postCreated' }));
       });
     }
-  }
-
-  if (method === 'PATCH') {
+  } else if (method === 'PATCH') {
     if (url.startsWith('/posts/')) {
       const id = Number(url.split('/')[2]); // 여기서 id는 게시물 id
       let body = '';
@@ -142,15 +136,13 @@ const httpRequestListener = function (req, res) {
           return res.end(JSON.stringify('Not Found'));
         } else {
           index.content = edit.content;
+          console.log(index);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify(index));
         }
-        console.log(index);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify(index));
       });
     }
-  }
-
-  if (method === 'DELETE') {
+  } else if (method === 'DELETE') {
     if (url.startsWith('/posts/')) {
       const id = Number(url.split('/')[2]);
       for (let i = 0; i < posts.length; i++) {
