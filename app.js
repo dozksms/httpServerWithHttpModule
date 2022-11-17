@@ -97,7 +97,6 @@ const httpRequestListener = function (req, res) {
   if (method === 'PATCH') {
     if (url.startsWith('/posts/')) {
       const id = Number(url.split('/')[2]); // 여기서 id는 게시물 id
-      console.log(id);
       let body = '';
       req.on('data', (data) => {
         body += data;
@@ -108,8 +107,6 @@ const httpRequestListener = function (req, res) {
         const index = posts.find((ele) => {
           return ele.id === id;
         });
-        console.log(index);
-        console.log(edit.content);
         if (!index) {
           res.writeHead(404, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify('Not Found'));
@@ -120,6 +117,22 @@ const httpRequestListener = function (req, res) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify(index));
       });
+    }
+  }
+
+  if (method === 'DELETE') {
+    if (url.startsWith('/posts/')) {
+      const id = Number(url.split('/')[2]);
+      console.log(id);
+      for (let i = 0; i < posts.length; i++) {
+        if (posts[i].id === id) {
+          posts.splice(i, 1);
+          i--;
+        }
+      }
+      console.log(posts);
+      res.writeHead(204, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ message: 'postingDeleted' }));
     }
   }
 };
