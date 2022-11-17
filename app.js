@@ -103,8 +103,16 @@ const httpRequestListener = function (req, res) {
 
       req.on('end', () => {
         const post = JSON.parse(body);
+        const user = users.find((ele) => {
+          return ele.id === id;
+        });
+        if (!user) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify('Not Found'));
+        }
         posts.push({
           id: post.id,
+          username: user.name,
           title: post.title,
           content: post.content,
           userId: id,
